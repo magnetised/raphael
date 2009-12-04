@@ -3056,6 +3056,23 @@ window.Raphael = (function () {
         }
         return out;
     };
+    paper.measureText = function (string, font, size) {
+        var letters = (string + E)[split](E),
+            width = 0,
+            scale;
+        R.is(font, "string") && (font = this.getFont(font));
+        if (font) {
+            scale = (size || 16) / font.face["units-per-em"];
+            for (var i = 0, ii = letters[length]; i < ii; i++) {
+                var prev = i && font.glyphs[letters[i - 1]] || {},
+                    curr = font.glyphs[letters[i]];
+								width += (curr.w || font.w);
+								width += i ? (prev.k && prev.k[letters[i]] || 0) : 0;
+            }
+						return width*scale;
+        }
+				return 0;
+    };
 
     R.format = function (token) {
         var args = R.is(arguments[1], "array") ? [0][concat](arguments[1]) : arguments,
