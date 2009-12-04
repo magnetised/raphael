@@ -2865,6 +2865,10 @@ window.Raphael = (function () {
     Element[proto].translate = function (x, y) {
         return this.attr({translation: x + " " + y});
     };
+		Element[proto].bind = function(eventName, callback) {
+			this.node["on"+eventName] = callback;
+			return this;
+		}
     Element[proto][toString] = function () {
         return "Rapha\xebl\u2019s object";
     };
