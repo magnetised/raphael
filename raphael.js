@@ -15,8 +15,15 @@ window.Raphael = (function () {
             was: "Raphael" in win,
             is: win.Raphael
         },
+        _image = "image", _text = "text", _path = "path", _rect = "rect", _ellipse = "ellipse", _circle = "circle",
+        _translation = "translation", _rotation = "rotation", _scale = "scale", _clip_rect = "clip-rect",
+        _stroke_width = "stroke-width",
+        _none = "none", _string = "string", _black = "#000",
+        _object = "object", _array = "array",
+        _font_weight = "font-weight", _font_style = "font-style",
+        _px = "px",
         R = function () {
-            if (R.is(arguments[0], "array")) {
+            if (R.is(arguments[0], _array)) {
                 var a = arguments[0],
                     cnv = create[apply](R, a.splice(0, 3 + R.is(a[0], nu))),
                     res = cnv.set();
@@ -33,6 +40,7 @@ window.Raphael = (function () {
         concat = "concat",
         E = "",
         S = " ",
+
         events = "click dblclick mousedown mousemove mouseout mouseover mouseup".split(S),
         has = "hasOwnProperty",
         isit = /^\[object\s+|\]$/gi,
@@ -58,7 +66,7 @@ window.Raphael = (function () {
         toFloat = parseFloat,
         toInt = parseInt,
         upperCase = String[proto].toUpperCase,
-        availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
+        availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: _black, "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
     R.version = "1.2.8";
@@ -69,7 +77,7 @@ window.Raphael = (function () {
     R.fn = {};
     R.is = function (o, type) {
         type = lowerCase.call(type);
-        return ((type == "object" || type == "undefined") && typeof o == type) || (o == null && type == "null") || lowerCase.call(objectToString.call(o)[rp](isit, E)) == type;
+        return ((type == _object || type == "undefined") && typeof o == type) || (o == null && type == "null") || lowerCase.call(objectToString.call(o)[rp](isit, E)) == type;
     };
     R.setWindow = function (newwin) {
         win = newwin;
@@ -98,13 +106,13 @@ window.Raphael = (function () {
                     value = ((value & 255) << 16) | (value & 65280) | ((value & 16711680) >>> 16);
                     return "#" + ("000000" + value[toString](16)).slice(-6);
                 } catch(e) {
-                    return "none";
+                    return _none;
                 }
             });
         } else {
             var i = doc.createElement("i");
             i.title = "Rapha\xebl Colour Picker";
-            i.style.display = "none";
+            i.style.display = _none;
             doc.body[appendChild](i);
             toHex = cacher(function (color) {
                 i.style.color = color;
@@ -114,7 +122,7 @@ window.Raphael = (function () {
         return toHex(color);
     };
     R.hsb2rgb = cacher(function (hue, saturation, brightness) {
-        if (R.is(hue, "object") && "h" in hue && "s" in hue && "b" in hue) {
+        if (R.is(hue, _object) && "h" in hue && "s" in hue && "b" in hue) {
             brightness = hue.b;
             saturation = hue.s;
             hue = hue.h;
@@ -123,7 +131,7 @@ window.Raphael = (function () {
             green,
             blue;
         if (brightness == 0) {
-            return {r: 0, g: 0, b: 0, hex: "#000"};
+            return {r: 0, g: 0, b: 0, hex: _black};
         }
         if (hue > 1 || saturation > 1 || brightness > 1) {
             hue /= 255;
@@ -152,12 +160,12 @@ window.Raphael = (function () {
         return rgb;
     }, R);
     R.rgb2hsb = cacher(function (red, green, blue) {
-        if (R.is(red, "object") && "r" in red && "g" in red && "b" in red) {
+        if (R.is(red, _object) && "r" in red && "g" in red && "b" in red) {
             blue = red.b;
             green = red.g;
             red = red.r;
         }
-        if (R.is(red, "string")) {
+        if (R.is(red, _string)) {
             var clr = R.getRGB(red);
             red = clr.r;
             green = clr.g;
@@ -214,10 +222,10 @@ window.Raphael = (function () {
 
     R.getRGB = cacher(function (colour) {
         if (!colour || !!((colour = colour + E).indexOf("-") + 1)) {
-            return {r: -1, g: -1, b: -1, hex: "none", error: 1};
+            return {r: -1, g: -1, b: -1, hex: _none, error: 1};
         }
-        if (colour == "none") {
-            return {r: -1, g: -1, b: -1, hex: "none"};
+        if (colour == _none) {
+            return {r: -1, g: -1, b: -1, hex: _none};
         }
         !(({hs: 1, rg: 1})[has](colour.substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
         var res,
@@ -273,7 +281,7 @@ window.Raphael = (function () {
             rgb.hex = "#" + r + g + b;
             return rgb;
         }
-        return {r: -1, g: -1, b: -1, hex: "none", error: 1};
+        return {r: -1, g: -1, b: -1, hex: _none, error: 1};
     }, R);
     R.getColor = function (value) {
         var start = this.getColor.start = this.getColor.start || {h: 0, s: 1, b: value || .75},
@@ -296,7 +304,7 @@ window.Raphael = (function () {
         }
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
-        if (R.is(pathString, "array") && R.is(pathString[0], "array")) { // rough assumption
+        if (R.is(pathString, _array) && R.is(pathString[0], _array)) { // rough assumption
             data = pathClone(pathString);
         }
         if (!data[length]) {
@@ -353,7 +361,7 @@ window.Raphael = (function () {
     }),
         pathClone = function (pathArray) {
             var res = [];
-            if (!R.is(pathArray, "array") || !R.is(pathArray && pathArray[0], "array")) { // rough assumption
+            if (!R.is(pathArray, _array) || !R.is(pathArray && pathArray[0], _array)) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
             }
             for (var i = 0, ii = pathArray[length]; i < ii; i++) {
@@ -366,7 +374,7 @@ window.Raphael = (function () {
             return res;
         },
         pathToRelative = cacher(function (pathArray) {
-            if (!R.is(pathArray, "array") || !R.is(pathArray && pathArray[0], "array")) { // rough assumption
+            if (!R.is(pathArray, _array) || !R.is(pathArray && pathArray[0], _array)) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
             }
             var res = [],
@@ -440,7 +448,7 @@ window.Raphael = (function () {
             return res;
         }, 0, pathClone),
         pathToAbsolute = cacher(function (pathArray) {
-            if (!R.is(pathArray, "array") || !R.is(pathArray && pathArray[0], "array")) { // rough assumption
+            if (!R.is(pathArray, _array) || !R.is(pathArray && pathArray[0], _array)) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
             }
             var res = [],
@@ -810,8 +818,8 @@ window.Raphael = (function () {
                 y,
                 width,
                 height;
-            if (R.is(arguments[0], "string") || R.is(arguments[0], "object")) {
-                if (R.is(arguments[0], "string")) {
+            if (R.is(arguments[0], _string) || R.is(arguments[0], _object)) {
+                if (R.is(arguments[0], _string)) {
                     container = doc.getElementById(arguments[0]);
                 } else {
                     container = arguments[0];
@@ -840,7 +848,7 @@ window.Raphael = (function () {
                             con[prop] = con === that ? f : function () { return f[apply](that, arguments); };
                         })(add[prop]);
                     break;
-                    case "object":
+                    case _object:
                         con[prop] = con[prop] || {};
                         plugins.call(this, con[prop], add[prop]);
                     break;
@@ -927,11 +935,11 @@ window.Raphael = (function () {
             return  "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
         };
         var thePath = function (pathString, SVG) {
-            var el = $("path");
+            var el = $(_path);
             SVG.canvas && SVG.canvas[appendChild](el);
             var p = new Element(el, SVG);
-            p.type = "path";
-            setFillAndStroke(p, {fill: "none", stroke: "#000", path: pathString});
+            p.type = _path;
+            setFillAndStroke(p, {fill: _none, stroke: _black, path: pathString});
             return p;
         };
         var addGradientFill = function (o, gradient, SVG) {
@@ -1004,7 +1012,7 @@ window.Raphael = (function () {
         var setFillAndStroke = function (o, params) {
             var dasharray = {
                     "": [0],
-                    "none": [0],
+                    _none: [0],
                     "-": [3, 1],
                     ".": [1, 1],
                     "-.": [3, 1, 1, 1],
@@ -1022,7 +1030,7 @@ window.Raphael = (function () {
                 addDashes = function (o, value) {
                     value = dasharray[lowerCase.call(value)];
                     if (value) {
-                        var width = o.attrs["stroke-width"] || "1",
+                        var width = o.attrs[_stroke_width] || "1",
                             butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
                             dashes = [];
                         var i = value[length];
@@ -1032,7 +1040,7 @@ window.Raphael = (function () {
                         $(node, {"stroke-dasharray": dashes[join](",")});
                     }
                 };
-            params[has]("rotation") && (rot = params.rotation);
+            params[has](_rotation) && (rot = params.rotation);
             var rotxy = (rot + E)[split](separator);
             if (!(rotxy.length - 1)) {
                 rotxy = null;
@@ -1048,7 +1056,7 @@ window.Raphael = (function () {
                 var value = params[att];
                 attrs[att] = value;
                 switch (att) {
-                    case "rotation":
+                    case _rotation:
                         o.rotate(value, true);
                         break;
                     // Hyperlink
@@ -1067,12 +1075,12 @@ window.Raphael = (function () {
                     case "cursor":
                         node.style.cursor = value;
                         break;
-                    case "clip-rect":
+                    case _clip_rect:
                         var rect = (value + E)[split](separator);
                         if (rect[length] == 4) {
                             o.clip && o.clip.parentNode.parentNode.removeChild(o.clip.parentNode);
                             var el = $("clipPath"),
-                                rc = $("rect");
+                                rc = $(_rect);
                             el.id = "r" + (R._id++)[toString](36);
                             $(rc, {
                                 x: rect[0],
@@ -1092,8 +1100,8 @@ window.Raphael = (function () {
                             delete o.clip;
                         }
                     break;
-                    case "path":
-                        if (value && o.type == "path") {
+                    case _path:
+                        if (value && o.type == _path) {
                             attrs.path = roundPath(pathToAbsolute(value));
                             $(node, {d: attrs.path});
                         }
@@ -1111,7 +1119,7 @@ window.Raphael = (function () {
                             value = -attrs.x - (attrs.width || 0);
                         }
                     case "rx":
-                        if (att == "rx" && o.type == "rect") {
+                        if (att == "rx" && o.type == _rect) {
                             break;
                         }
                     case "cx":
@@ -1132,7 +1140,7 @@ window.Raphael = (function () {
                             value = -attrs.y - (attrs.height || 0);
                         }
                     case "ry":
-                        if (att == "ry" && o.type == "rect") {
+                        if (att == "ry" && o.type == _rect) {
                             break;
                         }
                     case "cy":
@@ -1141,18 +1149,18 @@ window.Raphael = (function () {
                         o.pattern && updatePosition(o);
                         break;
                     case "r":
-                        if (o.type == "rect") {
+                        if (o.type == _rect) {
                             $(node, {rx: value, ry: value});
                         } else {
                             node[setAttribute](att, value);
                         }
                         break;
                     case "src":
-                        if (o.type == "image") {
+                        if (o.type == _image) {
                             node.setAttributeNS(o.paper.xlink, "href", value);
                         }
                         break;
-                    case "stroke-width":
+                    case _stroke_width:
                         node.style.strokeWidth = value;
                         // Need following line for Firefox
                         node[setAttribute](att, value);
@@ -1163,7 +1171,7 @@ window.Raphael = (function () {
                     case "stroke-dasharray":
                         addDashes(o, value);
                         break;
-                    case "translation":
+                    case _translation:
                         var xy = (value + E)[split](separator);
                         xy[0] = +xy[0] || 0;
                         xy[1] = +xy[1] || 0;
@@ -1173,7 +1181,7 @@ window.Raphael = (function () {
                         }
                         translate.call(o, xy[0], xy[1]);
                         break;
-                    case "scale":
+                    case _scale:
                         var xy = (value + E)[split](separator);
                         o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
                         break;
@@ -1181,7 +1189,7 @@ window.Raphael = (function () {
                         var isURL = (value + E).match(ISURL);
                         if (isURL) {
                             var el = $("pattern"),
-                                ig = $("image");
+                                ig = $(_image);
                             el.id = "r" + (R._id++)[toString](36);
                             $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
                             $(ig, {x: 0, y: 0});
@@ -1216,7 +1224,7 @@ window.Raphael = (function () {
                                 $(node, {"fill-opacity": attrs["fill-opacity"]});
                         } else if ((({circle: 1, ellipse: 1})[has](o.type) || (value + E).charAt() != "r") && addGradientFill(node, value, o.paper)) {
                             attrs.gradient = value;
-                            attrs.fill = "none";
+                            attrs.fill = _none;
                             break;
                         }
                     case "stroke":
@@ -1236,7 +1244,7 @@ window.Raphael = (function () {
                             break;
                         }
                     default:
-                        att == "font-size" && (value = toInt(value, 10) + "px");
+                        att == "font-size" && (value = toInt(value, 10) + _px);
                         var cssrule = att[rp](/(\-.)/g, function (w) {
                             return upperCase.call(w.substring(1));
                         });
@@ -1256,14 +1264,14 @@ window.Raphael = (function () {
         };
         var leading = 1.2;
         var tuneText = function (el, params) {
-            if (el.type != "text" || !(params[has]("text") || params[has]("font") || params[has]("font-size") || params[has]("x") || params[has]("y"))) {
+            if (el.type != _text || !(params[has](_text) || params[has]("font") || params[has]("font-size") || params[has]("x") || params[has]("y"))) {
                 return;
             }
             var a = el.attrs,
                 node = el.node,
                 fontSize = node.firstChild ? toInt(doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
 
-            if (params[has]("text")) {
+            if (params[has](_text)) {
                 a.text = params.text;
                 while (node.firstChild) {
                     node.removeChild(node.firstChild);
@@ -1347,7 +1355,7 @@ window.Raphael = (function () {
             return this;
         };
         Element[proto].hide = function () {
-            !this.removed && (this.node.style.display = "none");
+            !this.removed && (this.node.style.display = _none);
             return this;
         };
         Element[proto].show = function () {
@@ -1369,10 +1377,10 @@ window.Raphael = (function () {
             if (this.removed) {
                 return this;
             }
-            if (this.type == "path") {
+            if (this.type == _path) {
                 return pathDimensions(this.attrs.path);
             }
-            if (this.node.style.display == "none") {
+            if (this.node.style.display == _none) {
                 this.show();
                 var hide = true;
             }
@@ -1384,7 +1392,7 @@ window.Raphael = (function () {
             } finally {
                 bbox = bbox || {};
             }
-            if (this.type == "text") {
+            if (this.type == _text) {
                 bbox = {x: bbox.x, y: Infinity, width: 0, height: 0};
                 for (var i = 0, ii = this.node.getNumberOfChars(); i < ii; i++) {
                     var bb = this.node.getExtentOfChar(i);
@@ -1408,25 +1416,25 @@ window.Raphael = (function () {
                 this._.rt.deg && (res.rotation = this.rotate());
                 (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
                 delete res.translation;
-                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
+                res.gradient && res.fill == _none && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
-            if (arguments[length] == 1 && R.is(arguments[0], "string")) {
-                if (arguments[0] == "translation") {
+            if (arguments[length] == 1 && R.is(arguments[0], _string)) {
+                if (arguments[0] == _translation) {
                     return translate.call(this);
                 }
-                if (arguments[0] == "rotation") {
+                if (arguments[0] == _rotation) {
                     return this.rotate();
                 }
-                if (arguments[0] == "scale") {
+                if (arguments[0] == _scale) {
                     return this.scale();
                 }
-                if (arguments[0] == "fill" && this.attrs.fill == "none" && this.attrs.gradient) {
+                if (arguments[0] == "fill" && this.attrs.fill == _none && this.attrs.gradient) {
                     return this.attrs.gradient;
                 }
                 return this.attrs[arguments[0]];
             }
-            if (arguments[length] == 1 && R.is(arguments[0], "array")) {
+            if (arguments[length] == 1 && R.is(arguments[0], _array)) {
                 var values = {};
                 for (var j in arguments[0]) if (arguments[0][has](j)) {
                     values[arguments[0][j]] = this.attrs[arguments[0][j]];
@@ -1437,7 +1445,7 @@ window.Raphael = (function () {
                 var params = {};
                 params[arguments[0]] = arguments[1];
                 setFillAndStroke(this, params);
-            } else if (arguments[length] == 1 && R.is(arguments[0], "object")) {
+            } else if (arguments[length] == 1 && R.is(arguments[0], _object)) {
                 setFillAndStroke(this, arguments[0]);
             }
             return this;
@@ -1489,53 +1497,53 @@ window.Raphael = (function () {
         var theCircle = function (svg, x, y, r) {
             x = round(x);
             y = round(y);
-            var el = $("circle");
+            var el = $(_circle);
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {cx: x, cy: y, r: r, fill: "none", stroke: "#000"};
-            res.type = "circle";
+            res.attrs = {cx: x, cy: y, r: r, fill: _none, stroke: _black};
+            res.type = _circle;
             $(el, res.attrs);
             return res;
         };
         var theRect = function (svg, x, y, w, h, r) {
             x = round(x);
             y = round(y);
-            var el = $("rect");
+            var el = $(_rect);
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
-            res.type = "rect";
+            res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: _none, stroke: _black};
+            res.type = _rect;
             $(el, res.attrs);
             return res;
         };
         var theEllipse = function (svg, x, y, rx, ry) {
             x = round(x);
             y = round(y);
-            var el = $("ellipse");
+            var el = $(_ellipse);
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {cx: x, cy: y, rx: rx, ry: ry, fill: "none", stroke: "#000"};
-            res.type = "ellipse";
+            res.attrs = {cx: x, cy: y, rx: rx, ry: ry, fill: _none, stroke: _black};
+            res.type = _ellipse;
             $(el, res.attrs);
             return res;
         };
         var theImage = function (svg, src, x, y, w, h) {
-            var el = $("image");
-            $(el, {x: x, y: y, width: w, height: h, preserveAspectRatio: "none"});
+            var el = $(_image);
+            $(el, {x: x, y: y, width: w, height: h, preserveAspectRatio: _none});
             el.setAttributeNS(svg.xlink, "href", src);
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
             res.attrs = {x: x, y: y, width: w, height: h, src: src};
-            res.type = "image";
+            res.type = _image;
             return res;
         };
         var theText = function (svg, x, y, text) {
-            var el = $("text");
+            var el = $(_text);
             $(el, {x: x, y: y, "text-anchor": "middle"});
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {x: x, y: y, "text-anchor": "middle", text: text, font: availableAttrs.font, stroke: "none", fill: "#000"};
-            res.type = "text";
+            res.attrs = {x: x, y: y, "text-anchor": "middle", text: text, font: availableAttrs.font, stroke: _none, fill: _black};
+            res.type = _text;
             setFillAndStroke(res, res.attrs);
             return res;
         };
@@ -1567,7 +1575,7 @@ window.Raphael = (function () {
                 height: paper.height
             });
             if (container == 1) {
-                cnvs.style.cssText = "position:absolute;left:" + x + "px;top:" + y + "px";
+                cnvs.style.cssText = "position:absolute;left:" + x + "px;top:" + y + _px;
                 doc.body[appendChild](cnvs);
             } else {
                 if (container.firstChild) {
@@ -1642,21 +1650,21 @@ window.Raphael = (function () {
         };
         var thePath = function (pathString, VML) {
             var g = createNode("group");
-            g.style.cssText = "position:absolute;left:0;top:0;width:" + VML.width + "px;height:" + VML.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + VML.width + "px;height:" + VML.height + _px;
             g.coordsize = VML.coordsize;
             g.coordorigin = VML.coordorigin;
             var el = createNode("shape"), ol = el.style;
-            ol.width = VML.width + "px";
-            ol.height = VML.height + "px";
+            ol.width = VML.width + _px;
+            ol.height = VML.height + _px;
             el.coordsize = this.coordsize;
             el.coordorigin = this.coordorigin;
             g[appendChild](el);
             var p = new Element(el, g, VML);
             p.isAbsolute = true;
-            p.type = "path";
+            p.type = _path;
             p.path = [];
             p.Path = E;
-            pathString && setFillAndStroke(p, {fill: "none", stroke: "#000", path: pathString});
+            pathString && setFillAndStroke(p, {fill: _none, stroke: _black, path: pathString});
             VML.canvas[appendChild](g);
             return p;
         };
@@ -1674,7 +1682,7 @@ window.Raphael = (function () {
             params.title && (node.title = params.title);
             params.target && (node.target = params.target);
             params.cursor && (s.cursor = params.cursor);
-            if (params.path && o.type == "path") {
+            if (params.path && o.type == _path) {
                 a.path = params.path;
                 node.path = path2vml(a.path);
             }
@@ -1694,8 +1702,8 @@ window.Raphael = (function () {
                 xy = (params.scale + E)[split](separator);
                 o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
             }
-            if ("clip-rect" in params) {
-                var rect = (params["clip-rect"] + E)[split](separator);
+            if (_clip_rect in params) {
+                var rect = (params[_clip_rect] + E)[split](separator);
                 if (rect[length] == 4) {
                     rect[2] = +rect[2] + (+rect[0]);
                     rect[3] = +rect[3] + (+rect[1]);
@@ -1707,34 +1715,34 @@ window.Raphael = (function () {
                         dstyle.position = "absolute";
                         dstyle.top = 0;
                         dstyle.left = 0;
-                        dstyle.width = o.paper.width + "px";
-                        dstyle.height = o.paper.height + "px";
+                        dstyle.width = o.paper.width + _px;
+                        dstyle.height = o.paper.height + _px;
                         group.parentNode.insertBefore(div, group);
                         div[appendChild](group);
                         node.clipRect = div;
                     }
                 }
-                if (!params["clip-rect"]) {
+                if (!params[_clip_rect]) {
                     node.clipRect && (node.clipRect.style.clip = E);
                 }
             }
-            if (o.type == "image" && params.src) {
+            if (o.type == _image && params.src) {
                 node.src = params.src;
             }
-            if (o.type == "image" && params.opacity) {
+            if (o.type == _image && params.opacity) {
                 node.filterOpacity = " progid:DXImageTransform.Microsoft.Alpha(opacity=" + (params.opacity * 100) + ")";
                 s.filter = (node.filterMatrix || E) + (node.filterOpacity || E);
             }
             params.font && (s.font = params.font);
             params["font-family"] && (s.fontFamily = '"' + params["font-family"][split](",")[0][rp](/^['"]+|['"]+$/g, E) + '"');
             params["font-size"] && (s.fontSize = params["font-size"]);
-            params["font-weight"] && (s.fontWeight = params["font-weight"]);
-            params["font-style"] && (s.fontStyle = params["font-style"]);
+            params[_font_weight] && (s.fontWeight = params[_font_weight]);
+            params[_font_style] && (s.fontStyle = params[_font_style]);
             if (params.opacity != null || 
-                params["stroke-width"] != null ||
+                params[_stroke_width] != null ||
                 params.fill != null ||
                 params.stroke != null ||
-                params["stroke-width"] != null ||
+                params[_stroke_width] != null ||
                 params["stroke-opacity"] != null ||
                 params["fill-opacity"] != null ||
                 params["stroke-dasharray"] != null ||
@@ -1752,7 +1760,7 @@ window.Raphael = (function () {
                     fill.opacity = opacity;
                 }
                 params.fill && (fill.on = true);
-                if (fill.on == null || params.fill == "none") {
+                if (fill.on == null || params.fill == _none) {
                     fill.on = false;
                 }
                 if (fill.on && params.fill) {
@@ -1765,7 +1773,7 @@ window.Raphael = (function () {
                         fill.src = E;
                         fill.type = "solid";
                         if (R.getRGB(params.fill).error && (res.type in {circle: 1, ellipse: 1} || (params.fill + E).charAt() != "r") && addGradientFill(res, params.fill)) {
-                            a.fill = "none";
+                            a.fill = _none;
                             a.gradient = params.fill;
                         }
                     }
@@ -1774,8 +1782,8 @@ window.Raphael = (function () {
                 var stroke = (node.getElementsByTagName("stroke") && node.getElementsByTagName("stroke")[0]),
                 newstroke = false;
                 !stroke && (newstroke = stroke = createNode("stroke"));
-                if ((params.stroke && params.stroke != "none") ||
-                    params["stroke-width"] ||
+                if ((params.stroke && params.stroke != _none) ||
+                    params[_stroke_width] ||
                     params["stroke-opacity"] != null ||
                     params["stroke-dasharray"] ||
                     params["stroke-miterlimit"] ||
@@ -1783,14 +1791,14 @@ window.Raphael = (function () {
                     params["stroke-linecap"]) {
                     stroke.on = true;
                 }
-                (params.stroke == "none" || stroke.on == null || params.stroke == 0 || params["stroke-width"] == 0) && (stroke.on = false);
+                (params.stroke == _none || stroke.on == null || params.stroke == 0 || params[_stroke_width] == 0) && (stroke.on = false);
                 stroke.on && params.stroke && (stroke.color = R.getRGB(params.stroke).hex);
                 var opacity = ((+a["stroke-opacity"] + 1 || 2) - 1) * ((+a.opacity + 1 || 2) - 1),
-                    width = (toFloat(params["stroke-width"]) || 1) * .75;
+                    width = (toFloat(params[_stroke_width]) || 1) * .75;
                 opacity < 0 && (opacity = 0);
                 opacity > 1 && (opacity = 1);
-                params["stroke-width"] == null && (width = a["stroke-width"]);
-                params["stroke-width"] && (stroke.weight = width);
+                params[_stroke_width] == null && (width = a[_stroke_width]);
+                params[_stroke_width] && (stroke.weight = width);
                 width && width < 1 && (opacity *= width) && (stroke.weight = 1);
                 stroke.opacity = opacity;
                 
@@ -1814,13 +1822,13 @@ window.Raphael = (function () {
                 }
                 newstroke && node[appendChild](stroke);
             }
-            if (res.type == "text") {
+            if (res.type == _text) {
                 var s = res.paper.span.style;
                 a.font && (s.font = a.font);
                 a["font-family"] && (s.fontFamily = a["font-family"]);
                 a["font-size"] && (s.fontSize = a["font-size"]);
-                a["font-weight"] && (s.fontWeight = a["font-weight"]);
-                a["font-style"] && (s.fontStyle = a["font-style"]);
+                a[_font_weight] && (s.fontWeight = a[_font_weight]);
+                a[_font_style] && (s.fontStyle = a[_font_style]);
                 res.node.string && (res.paper.span.innerHTML = (res.node.string + E)[rp](/</g, "&#60;")[rp](/&/g, "&#38;")[rp](/\n/g, "<br>"));
                 res.W = a.w = res.paper.span.offsetWidth;
                 res.H = a.h = res.paper.span.offsetHeight;
@@ -1876,7 +1884,7 @@ window.Raphael = (function () {
             fill = fill[0] || createNode("fill");
             if (dots[length]) {
                 fill.on = true;
-                fill.method = "none";
+                fill.method = _none;
                 fill.type = (type == "radial") ? "gradientradial" : "gradient";
                 fill.color = dots[0].color;
                 fill.color2 = dots[dots[length] - 1].color;
@@ -1973,32 +1981,32 @@ window.Raphael = (function () {
                 w,
                 h;
             switch (this.type) {
-                case "circle":
+                case _circle:
                     x = attr.cx - attr.r;
                     y = attr.cy - attr.r;
                     w = h = attr.r * 2;
                     break;
-                case "ellipse":
+                case _ellipse:
                     x = attr.cx - attr.rx;
                     y = attr.cy - attr.ry;
                     w = attr.rx * 2;
                     h = attr.ry * 2;
                     break;
-                case "rect":
-                case "image":
+                case _rect:
+                case _image:
                     x = +attr.x;
                     y = +attr.y;
                     w = attr.width || 0;
                     h = attr.height || 0;
                     break;
-                case "text":
+                case _text:
                     this.textpath.v = ["m", round(attr.x), ", ", round(attr.y - 2), "l", round(attr.x) + 1, ", ", round(attr.y - 2)][join](E);
                     x = attr.x - round(this.W / 2);
                     y = attr.y - this.H / 2;
                     w = this.W;
                     h = this.H;
                     break;
-                case "path":
+                case _path:
                     if (!this.attrs.path) {
                         x = 0;
                         y = 0;
@@ -2023,30 +2031,30 @@ window.Raphael = (function () {
             cy = (cy == null) ? y + h / 2 : cy;
             var left = cx - this.paper.width / 2,
                 top = cy - this.paper.height / 2;
-            if (this.type == "path" || this.type == "text") {
-                (gs.left != left + "px") && (gs.left = left + "px");
-                (gs.top != top + "px") && (gs.top = top + "px");
-                this.X = this.type == "text" ? x : -left;
-                this.Y = this.type == "text" ? y : -top;
+            if (this.type == _path || this.type == _text) {
+                (gs.left != left + _px) && (gs.left = left + _px);
+                (gs.top != top + _px) && (gs.top = top + _px);
+                this.X = this.type == _text ? x : -left;
+                this.Y = this.type == _text ? y : -top;
                 this.W = w;
                 this.H = h;
-                (os.left != -left + "px") && (os.left = -left + "px");
-                (os.top != -top + "px") && (os.top = -top + "px");
+                (os.left != -left + _px) && (os.left = -left + _px);
+                (os.top != -top + _px) && (os.top = -top + _px);
             } else {
-                (gs.left != left + "px") && (gs.left = left + "px");
-                (gs.top != top + "px") && (gs.top = top + "px");
+                (gs.left != left + _px) && (gs.left = left + _px);
+                (gs.top != top + _px) && (gs.top = top + _px);
                 this.X = x;
                 this.Y = y;
                 this.W = w;
                 this.H = h;
-                (gs.width != this.paper.width + "px") && (gs.width = this.paper.width + "px");
-                (gs.height != this.paper.height + "px") && (gs.height = this.paper.height + "px");
-                (os.left != x - left + "px") && (os.left = x - left + "px");
-                (os.top != y - top + "px") && (os.top = y - top + "px");
-                (os.width != w + "px") && (os.width = w + "px");
-                (os.height != h + "px") && (os.height = h + "px");
+                (gs.width != this.paper.width + _px) && (gs.width = this.paper.width + _px);
+                (gs.height != this.paper.height + _px) && (gs.height = this.paper.height + _px);
+                (os.left != x - left + _px) && (os.left = x - left + _px);
+                (os.top != y - top + _px) && (os.top = y - top + _px);
+                (os.width != w + _px) && (os.width = w + _px);
+                (os.height != h + _px) && (os.height = h + _px);
                 var arcsize = (+params.r || 0) / mmin(w, h);
-                if (this.type == "rect" && this.arcsize.toFixed(4) != arcsize.toFixed(4) && (arcsize || this.arcsize)) {
+                if (this.type == _rect && this.arcsize.toFixed(4) != arcsize.toFixed(4) && (arcsize || this.arcsize)) {
                     // We should replace element with the new one
                     var o = createNode("roundrect"),
                         a = {},
@@ -2070,7 +2078,7 @@ window.Raphael = (function () {
             }
         };
         Element[proto].hide = function () {
-            !this.removed && (this.Group.style.display = "none");
+            !this.removed && (this.Group.style.display = _none);
             return this;
         };
         Element[proto].show = function () {
@@ -2081,7 +2089,7 @@ window.Raphael = (function () {
             if (this.removed) {
                 return this;
             }
-            if (this.type == "path") {
+            if (this.type == _path) {
                 return pathDimensions(this.attrs.path);
             }
             return {
@@ -2116,25 +2124,25 @@ window.Raphael = (function () {
                 this._.rt.deg && (res.rotation = this.rotate());
                 (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
                 delete res.translation;
-                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
+                res.gradient && res.fill == _none && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
-            if (arguments[length] == 1 && R.is(arguments[0], "string")) {
-                if (arguments[0] == "translation") {
+            if (arguments[length] == 1 && R.is(arguments[0], _string)) {
+                if (arguments[0] == _translation) {
                     return translate.call(this);
                 }
-                if (arguments[0] == "rotation") {
+                if (arguments[0] == _rotation) {
                     return this.rotate();
                 }
-                if (arguments[0] == "scale") {
+                if (arguments[0] == _scale) {
                     return this.scale();
                 }
-                if (arguments[0] == "fill" && this.attrs.fill == "none" && this.attrs.gradient) {
+                if (arguments[0] == "fill" && this.attrs.fill == _none && this.attrs.gradient) {
                     return this.attrs.gradient;
                 }
                 return this.attrs[arguments[0]];
             }
-            if (this.attrs && arguments[length] == 1 && R.is(arguments[0], "array")) {
+            if (this.attrs && arguments[length] == 1 && R.is(arguments[0], _array)) {
                 var values = {};
                 for (var i = 0, ii = arguments[0][length]; i < ii; i++) {
                     values[arguments[0][i]] = this.attrs[arguments[0][i]];
@@ -2146,16 +2154,16 @@ window.Raphael = (function () {
                 params = {};
                 params[arguments[0]] = arguments[1];
             }
-            arguments[length] == 1 && R.is(arguments[0], "object") && (params = arguments[0]);
+            arguments[length] == 1 && R.is(arguments[0], _object) && (params = arguments[0]);
             if (params) {
-                if (params.text && this.type == "text") {
+                if (params.text && this.type == _text) {
                     this.node.string = params.text;
                 }
                 setFillAndStroke(this, params);
                 if (params.gradient && (({circle: 1, ellipse: 1})[has](this.type) || (params.gradient + E).charAt() != "r")) {
                     addGradientFill(this, params.gradient);
                 }
-                (this.type != "path" || this._.rt.deg) && this.setBox(this.attrs);
+                (this.type != _path || this._.rt.deg) && this.setBox(this.attrs);
             }
             return this;
         };
@@ -2199,13 +2207,13 @@ window.Raphael = (function () {
             var g = createNode("group"),
                 o = createNode("oval"),
                 ol = o.style;
-            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + _px;
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             g[appendChild](o);
             var res = new Element(o, g, vml);
-            res.type = "circle";
-            setFillAndStroke(res, {stroke: "#000", fill: "none"});
+            res.type = _circle;
+            setFillAndStroke(res, {stroke: _black, fill: _none});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.r = r;
@@ -2217,14 +2225,14 @@ window.Raphael = (function () {
             var g = createNode("group"),
                 o = createNode("roundrect"),
                 arcsize = (+r || 0) / (mmin(w, h));
-            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + _px;
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             g[appendChild](o);
             o.arcsize = arcsize;
             var res = new Element(o, g, vml);
-            res.type = "rect";
-            setFillAndStroke(res, {stroke: "#000"});
+            res.type = _rect;
+            setFillAndStroke(res, {stroke: _black});
             res.arcsize = arcsize;
             res.setBox({x: x, y: y, width: w, height: h, r: r});
             vml.canvas[appendChild](g);
@@ -2234,13 +2242,13 @@ window.Raphael = (function () {
             var g = createNode("group"),
                 o = createNode("oval"),
                 ol = o.style;
-            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + _px;
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             g[appendChild](o);
             var res = new Element(o, g, vml);
-            res.type = "ellipse";
-            setFillAndStroke(res, {stroke: "#000"});
+            res.type = _ellipse;
+            setFillAndStroke(res, {stroke: _black});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.rx = rx;
@@ -2251,15 +2259,15 @@ window.Raphael = (function () {
         };
         var theImage = function (vml, src, x, y, w, h) {
             var g = createNode("group"),
-                o = createNode("image"),
+                o = createNode(_image),
                 ol = o.style;
-            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + _px;
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             o.src = src;
             g[appendChild](o);
             var res = new Element(o, g, vml);
-            res.type = "image";
+            res.type = _image;
             res.attrs.src = src;
             res.attrs.x = x;
             res.attrs.y = y;
@@ -2273,10 +2281,10 @@ window.Raphael = (function () {
             var g = createNode("group"),
                 el = createNode("shape"),
                 ol = el.style,
-                path = createNode("path"),
+                path = createNode(_path),
                 ps = path.style,
                 o = createNode("textpath");
-            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + _px;
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             path.v = R.format("m{0},{1}l{2},{1}", round(x), round(y), round(x) + 1);
@@ -2291,21 +2299,21 @@ window.Raphael = (function () {
             var res = new Element(o, g, vml);
             res.shape = el;
             res.textpath = path;
-            res.type = "text";
+            res.type = _text;
             res.attrs.text = text;
             res.attrs.x = x;
             res.attrs.y = y;
             res.attrs.w = 1;
             res.attrs.h = 1;
-            setFillAndStroke(res, {font: availableAttrs.font, stroke: "none", fill: "#000"});
+            setFillAndStroke(res, {font: availableAttrs.font, stroke: _none, fill: _black});
             res.setBox();
             vml.canvas[appendChild](g);
             return res;
         };
         var setSize = function (width, height) {
             var cs = this.canvas.style;
-            width == +width && (width += "px");
-            height == +height && (height += "px");
+            width == +width && (width += _px);
+            height == +height && (height += _px);
             cs.width = width;
             cs.height = height;
             cs.clip = "rect(0 " + width + " " + height + " 0)";
@@ -2338,8 +2346,8 @@ window.Raphael = (function () {
                 cs = c.style;
             width = width || 512;
             height = height || 342;
-            width == +width && (width += "px");
-            height == +height && (height += "px");
+            width == +width && (width += _px);
+            height == +height && (height += _px);
             res.width = 1e3;
             res.height = 1e3;
             res.coordsize = "1000 1000";
@@ -2350,8 +2358,8 @@ window.Raphael = (function () {
             cs.cssText = R.format("width:{0};height:{1};position:absolute;clip:rect(0 {0} {1} 0);overflow:hidden", width, height);
             if (container == 1) {
                 doc.body[appendChild](c);
-                cs.left = x + "px";
-                cs.top = y + "px";
+                cs.left = x + _px;
+                cs.top = y + _px;
                 container = {
                     style: {
                         width: width,
@@ -2463,7 +2471,7 @@ window.Raphael = (function () {
         return theEllipse(this, x || 0, y || 0, rx || 0, ry || 0);
     };
     paper.path = function (pathString) {
-        pathString && !R.is(pathString, "string") && !R.is(pathString[0], "array") && (pathString += E);
+        pathString && !R.is(pathString, _string) && !R.is(pathString[0], _array) && (pathString += E);
         return thePath(R.format[apply](R, arguments), this);
     };
     paper.image = function (src, x, y, w, h) {
@@ -2509,8 +2517,8 @@ window.Raphael = (function () {
                 ncx = cx + (rcx - cx) * kx,
                 ncy = cy + (rcy - cy) * ky;
             switch (this.type) {
-                case "rect":
-                case "image":
+                case _rect:
+                case _image:
                     var neww = a.width * dirx * kx,
                         newh = a.height * diry * ky,
                         newr = a.r * mmin(kx, ky),
@@ -2524,8 +2532,8 @@ window.Raphael = (function () {
                         y: newy
                     });
                     break;
-                case "circle":
-                case "ellipse":
+                case _circle:
+                case _ellipse:
                     this.attr({
                         rx: a.rx * dirx * kx,
                         ry: a.ry * diry * ky,
@@ -2534,7 +2542,7 @@ window.Raphael = (function () {
                         cy: ncy
                     });
                     break;
-                case "path":
+                case _path:
                     var path = pathToRelative(a.path),
                         skip = true;
                     for (var i = 0, ii = path[length]; i < ii; i++) {
@@ -2707,7 +2715,7 @@ window.Raphael = (function () {
                                     upto255(round(from[attr].b + pos * ms * diff[attr].b))
                                 ][join](",") + ")";
                                 break;
-                            case "path":
+                            case _path:
                                 now = [];
                                 for (var i = 0, ii = from[attr][length]; i < ii; i++) {
                                     now[i] = [from[attr][i][0]];
@@ -2720,21 +2728,21 @@ window.Raphael = (function () {
                                 break;
                             case "csv":
                                 switch (attr) {
-                                    case "translation":
+                                    case _translation:
                                         var x = diff[attr][0] * (time - prev),
                                             y = diff[attr][1] * (time - prev);
                                         t.x += x;
                                         t.y += y;
                                         now = x + S + y;
                                     break;
-                                    case "rotation":
+                                    case _rotation:
                                         now = +from[attr][0] + pos * ms * diff[attr][0];
                                         from[attr][1] && (now += "," + from[attr][1] + "," + from[attr][2]);
                                     break;
-                                    case "scale":
+                                    case _scale:
                                         now = [+from[attr][0] + pos * ms * diff[attr][0], +from[attr][1] + pos * ms * diff[attr][1], (2 in to[attr] ? to[attr][2] : E), (3 in to[attr] ? to[attr][3] : E)][join](S);
                                     break;
-                                    case "clip-rect":
+                                    case _clip_rect:
                                         now = [];
                                         var i = 4;
                                         while (i--) {
@@ -2772,16 +2780,16 @@ window.Raphael = (function () {
             this._.tx += +x;
             this._.ty += +y;
             switch (this.type) {
-                case "circle":
-                case "ellipse":
+                case _circle:
+                case _ellipse:
                     this.attr({cx: +x + this.attrs.cx, cy: +y + this.attrs.cy});
                     break;
-                case "rect":
-                case "image":
-                case "text":
+                case _rect:
+                case _image:
+                case _text:
                     this.attr({x: +x + this.attrs.x, y: +y + this.attrs.y});
                     break;
-                case "path":
+                case _path:
                     var path = pathToRelative(this.attrs.path);
                     path[0][1] += +x;
                     path[0][2] += +y;
@@ -2823,7 +2831,7 @@ window.Raphael = (function () {
                             b: (toColour.b - from[attr].b) / ms
                         };
                         break;
-                    case "path":
+                    case _path:
                         var pathes = path2curve(from[attr], to[attr]);
                         from[attr] = pathes[0];
                         to[attr] = pathes[1];
@@ -2839,20 +2847,20 @@ window.Raphael = (function () {
                         var values = (params[attr] + E)[split](separator),
                             from2 = (from[attr] + E)[split](separator);
                         switch (attr) {
-                            case "translation":
+                            case _translation:
                                 from[attr] = [0, 0];
                                 diff[attr] = [values[0] / ms, values[1] / ms];
                             break;
-                            case "rotation":
+                            case _rotation:
                                 from[attr] = (from2[1] == values[1] && from2[2] == values[2]) ? from2 : [0, values[1], values[2]];
                                 diff[attr] = [(values[0] - from[attr][0]) / ms, 0, 0];
                             break;
-                            case "scale":
+                            case _scale:
                                 params[attr] = values;
                                 from[attr] = (from[attr] + E)[split](separator);
                                 diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][1]) / ms, 0, 0];
                             break;
-                            case "clip-rect":
+                            case _clip_rect:
                                 from[attr] = (from[attr] + E)[split](separator);
                                 diff[attr] = [];
                                 var i = 4;
@@ -2939,7 +2947,7 @@ window.Raphael = (function () {
         })(method);
     }
     Set[proto].attr = function (name, value) {
-        if (name && R.is(name, "array") && R.is(name[0], "object")) {
+        if (name && R.is(name, _array) && R.is(name[0], _object)) {
             for (var j = 0, jj = name[length]; j < jj; j++) {
                 this.items[j].attr(name[j]);
             }
@@ -3051,7 +3059,7 @@ window.Raphael = (function () {
         if (font) {
             for (var i = 0, ii = font[length]; i < ii; i++) {
                 thefont = font[i];
-                if (thefont.face["font-weight"] == weight && (thefont.face["font-style"] == style || !thefont.face["font-style"]) && thefont.face["font-stretch"] == stretch) {
+                if (thefont.face[_font_weight] == weight && (thefont.face[_font_style] == style || !thefont.face[_font_style]) && thefont.face["font-stretch"] == stretch) {
                     break;
                 }
             }
@@ -3065,7 +3073,7 @@ window.Raphael = (function () {
             shift = 0,
             path = E,
             scale;
-        R.is(font, "string") && (font = this.getFont(font));
+        R.is(font, _string) && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
             var bb = font.face.bbox.split(separator),
@@ -3075,7 +3083,7 @@ window.Raphael = (function () {
                 var prev = i && font.glyphs[letters[i - 1]] || {},
                     curr = font.glyphs[letters[i]];
                 shift += i ? (prev.w || font.w) + (prev.k && prev.k[letters[i]] || 0) : 0;
-                curr && curr.d && out[push](this.path(curr.d).attr({fill: "#000", stroke: "none", translation: [shift, 0]}));
+                curr && curr.d && out[push](this.path(curr.d).attr({fill: _black, stroke: _none, translation: [shift, 0]}));
             }
             out.scale(scale, scale, top, height).translate(x - top, y - height);
         }
@@ -3085,7 +3093,7 @@ window.Raphael = (function () {
         var letters = (string + E)[split](E),
             width = 0,
             scale;
-        R.is(font, "string") && (font = this.getFont(font));
+        R.is(font, _string) && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
             for (var i = 0, ii = letters[length]; i < ii; i++) {
@@ -3100,9 +3108,9 @@ window.Raphael = (function () {
     };
 
     R.format = function (token) {
-        var args = R.is(arguments[1], "array") ? [0][concat](arguments[1]) : arguments,
+        var args = R.is(arguments[1], _array) ? [0][concat](arguments[1]) : arguments,
             rg = /\{(\d+)\}/g;
-        token && R.is(token, "string") && args[length] - 1 && (token = token[rp](rg, function (str, i) {
+        token && R.is(token, _string) && args[length] - 1 && (token = token[rp](rg, function (str, i) {
             return args[++i] == null ? E : args[i];
         }));
         return token || E;
