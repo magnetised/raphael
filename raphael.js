@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.6 - JavaScript Vector Library
+ * Raphael 1.2.8 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,6 +8,7 @@
 
 window.Raphael = (function () {
     var separator = /[, ]+/,
+        elements = /^(circle|rect|path|ellipse|text|image)$/,
         doc = document,
         win = window,
         oldRaphael = {
@@ -21,7 +22,7 @@ window.Raphael = (function () {
                     res = cnv.set();
                 for (var i = 0, ii = a[length]; i < ii; i++) {
                     var j = a[i] || {};
-                    ({circle:1, rect:1, path:1, ellipse:1, text:1, image:1})[has](j.type) && res[push](cnv[j.type]().attr(j));
+                    elements.test(j.type) && res[push](cnv[j.type]().attr(j));
                 }
                 return res;
             }
@@ -50,6 +51,7 @@ window.Raphael = (function () {
         push = "push",
         rg = /^(?=[\da-f]$)/,
         ISURL = /^url\(['"]?([^\)]+)['"]?\)$/i,
+        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hs[bl]\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hs[bl]\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
         round = math.round,
         setAttribute = "setAttribute",
         split = "split",
@@ -59,7 +61,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.6";
+    R.version = "1.2.8";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -80,12 +82,12 @@ window.Raphael = (function () {
             var trim = /^\s+|\s+$/g;
             toHex = cacher(function (color) {
                 var bod;
-                color = (color + E).replace(trim, E);
+                color = (color + E)[rp](trim, E);
                 try {
-                    var document = new ActiveXObject("htmlfile");
-                    document.write("<body>");
-                    document.close();
-                    bod = document.body;
+                    var docum = new ActiveXObject("htmlfile");
+                    docum.write("<body>");
+                    docum.close();
+                    bod = docum.body;
                 } catch(e) {
                     bod = createPopup().document.body;
                 }
@@ -101,8 +103,8 @@ window.Raphael = (function () {
             });
         } else {
             var i = doc.createElement("i");
-            i.className = "Rapha\xebl Colour Picker";
-            i.style.cssText = "display:none";
+            i.title = "Rapha\xebl Colour Picker";
+            i.style.display = "none";
             doc.body[appendChild](i);
             toHex = cacher(function (color) {
                 i.style.color = color;
@@ -211,19 +213,19 @@ window.Raphael = (function () {
     }
 
     R.getRGB = cacher(function (colour) {
-        if (!colour || !!((colour + E).indexOf("-") + 1)) {
+        if (!colour || !!((colour = colour + E).indexOf("-") + 1)) {
             return {r: -1, g: -1, b: -1, hex: "none", error: 1};
         }
-        colour = colour + E;
         if (colour == "none") {
             return {r: -1, g: -1, b: -1, hex: "none"};
         }
-        !({hs: 1, rg: 1})[has](colour.substring(0, 2)) && (colour = toHex(colour));
+        !(({hs: 1, rg: 1})[has](colour.substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
         var res,
             red,
             green,
             blue,
-            rgb = colour.match(/^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hs[bl]\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hs[bl]\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i);
+            t,
+            rgb = colour.match(colourRegExp);
         if (rgb) {
             if (rgb[2]) {
                 blue = toInt(rgb[2].substring(5), 16);
@@ -231,9 +233,9 @@ window.Raphael = (function () {
                 red = toInt(rgb[2].substring(1, 3), 16);
             }
             if (rgb[3]) {
-                blue = toInt(rgb[3].substring(3) + rgb[3].substring(3), 16);
-                green = toInt(rgb[3].substring(2, 3) + rgb[3].substring(2, 3), 16);
-                red = toInt(rgb[3].substring(1, 2) + rgb[3].substring(1, 2), 16);
+                blue = toInt((t = rgb[3].charAt(3)) + t, 16);
+                green = toInt((t = rgb[3].charAt(2)) + t, 16);
+                red = toInt((t = rgb[3].charAt(1)) + t, 16);
             }
             if (rgb[4]) {
                 rgb = rgb[4][split](/\s*,\s*/);
@@ -555,8 +557,8 @@ window.Raphael = (function () {
                         math.sqrt(math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
-                    f1 = math.asin((y1 - cy) / ry),
-                    f2 = math.asin((y2 - cy) / ry);
+                    f1 = math.asin(((y1 - cy) / ry).toFixed(7)),
+                    f2 = math.asin(((y2 - cy) / ry).toFixed(7));
 
                 f1 = x1 < cx ? PI - f1 : f1;
                 f2 = x2 < cx ? PI - f2 : f2;
@@ -601,7 +603,7 @@ window.Raphael = (function () {
             if (recursive) {
                 return [m2, m3, m4][concat](res);
             } else {
-                res = [m2, m3, m4][concat](res)[join](",")[split](",");
+                res = [m2, m3, m4][concat](res)[join]()[split](",");
                 var newres = [];
                 for (var i = 0, ii = res[length]; i < ii; i++) {
                     newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
@@ -889,7 +891,8 @@ window.Raphael = (function () {
             el.prev = el2.prev;
             el2.prev = el;
             el.next = el2;
-        };
+        },
+        radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/;
 
     // SVG
     if (R.svg) {
@@ -935,14 +938,16 @@ window.Raphael = (function () {
             var type = "linear",
                 fx = .5, fy = .5,
                 s = o.style;
-            gradient = (gradient + E)[rp](/^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/, function (all, _fx, _fy) {
+            gradient = (gradient + E)[rp](radial_gradient, function (all, _fx, _fy) {
                 type = "radial";
                 if (_fx && _fy) {
                     fx = toFloat(_fx);
                     fy = toFloat(_fy);
-                    if (pow(fx - .5, 2) + pow(fy - .5, 2) > .25) {
-                        fy = math.sqrt(.25 - pow(fx - .5, 2)) + .5;
-                    }
+                    var dir = ((fy > .5) * 2 - 1);
+                    pow(fx - .5, 2) + pow(fy - .5, 2) > .25 &&
+                        (fy = math.sqrt(.25 - pow(fx - .5, 2)) * dir + .5) &&
+                        fy != .5 &&
+                        (fy = fy.toFixed(5) - 1e-5 * dir);
                 }
                 return E;
             });
@@ -972,7 +977,7 @@ window.Raphael = (function () {
             }
             var el = $(type + "Gradient");
             el.id = "r" + (R._id++)[toString](36);
-            type == "radial" ? $(el, {fx: fx, fy: fy}) : $(el, {x1: vector[0], y1: vector[1], x2: vector[2], y2: vector[3]});
+            $(el, type == "radial" ? {fx: fx, fy: fy} : {x1: vector[0], y1: vector[1], x2: vector[2], y2: vector[3]});
             SVG.defs[appendChild](el);
             for (var i = 0, ii = dots[length]; i < ii; i++) {
                 var stop = $("stop");
@@ -1178,7 +1183,7 @@ window.Raphael = (function () {
                             var el = $("pattern"),
                                 ig = $("image");
                             el.id = "r" + (R._id++)[toString](36);
-                            $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse"});
+                            $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
                             $(ig, {x: 0, y: 0});
                             ig.setAttributeNS(o.paper.xlink, "href", isURL[1]);
                             el[appendChild](ig);
@@ -1400,6 +1405,10 @@ window.Raphael = (function () {
                 for (var i in this.attrs) if (this.attrs[has](i)) {
                     res[i] = this.attrs[i];
                 }
+                this._.rt.deg && (res.rotation = this.rotate());
+                (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
+                delete res.translation;
+                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
             if (arguments[length] == 1 && R.is(arguments[0], "string")) {
@@ -1841,14 +1850,12 @@ window.Raphael = (function () {
                 type = "linear",
                 fxfy = ".5 .5";
             o.attrs.gradient = gradient;
-            gradient = (gradient + E)[rp](/^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/, function (all, fx, fy) {
+            gradient = (gradient + E)[rp](radial_gradient, function (all, fx, fy) {
                 type = "radial";
                 if (fx && fy) {
                     fx = toFloat(fx);
                     fy = toFloat(fy);
-                    if (pow(fx - .5, 2) + pow(fy - .5, 2) > .25) {
-                        fy = math.sqrt(.25 - pow(fx - .5, 2)) + .5;
-                    }
+                    pow(fx - .5, 2) + pow(fy - .5, 2) > .25 && (fy = math.sqrt(.25 - pow(fx - .5, 2)) * ((fy > .5) * 2 - 1) + .5);
                     fxfy = fx + S + fy;
                 }
                 return E;
@@ -1877,7 +1884,7 @@ window.Raphael = (function () {
                 for (var i = 0, ii = dots[length]; i < ii; i++) {
                     dots[i].offset && clrs[push](dots[i].offset + S + dots[i].color);
                 }
-                fill.colors.value = clrs[length] ? clrs[join](",") : "0% " + fill.color;
+                fill.colors && (fill.colors.value = clrs[length] ? clrs[join](",") : "0% " + fill.color);
                 if (type == "radial") {
                     fill.focus = "100%";
                     fill.focussize = fxfy;
@@ -2044,7 +2051,7 @@ window.Raphael = (function () {
                     var o = createNode("roundrect"),
                         a = {},
                         i = 0,
-                        ii = this.events[length];
+                        ii = this.events && this.events[length];
                     o.arcsize = arcsize;
                     o.raphael = this;
                     this.Group[appendChild](o);
@@ -2106,6 +2113,10 @@ window.Raphael = (function () {
                 for (var i in this.attrs) if (this.attrs[has](i)) {
                     res[i] = this.attrs[i];
                 }
+                this._.rt.deg && (res.rotation = this.rotate());
+                (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
+                delete res.translation;
+                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
             if (arguments[length] == 1 && R.is(arguments[0], "string")) {
@@ -2466,7 +2477,7 @@ window.Raphael = (function () {
         return new Set(itemsArray);
     };
     paper.setSize = setSize;
-    function scaleToString() {
+    function x_y() {
         return this.x + S + this.y;
     };
     Element[proto].scale = function (x, y, cx, cy) {
@@ -2474,7 +2485,7 @@ window.Raphael = (function () {
             return {
                 x: this._.sx,
                 y: this._.sy,
-                toString: scaleToString
+                toString: x_y
             };
         }
         y = y || x;
@@ -2595,6 +2606,9 @@ window.Raphael = (function () {
             this._.sy = y;
         }
         return this;
+    };
+    Element[proto].clone = function () {
+        return this.paper[this.type]().attr(this.attr());
     };
 
     // animation easing formulas
@@ -2753,7 +2767,7 @@ window.Raphael = (function () {
         },
         translate = function (x, y) {
             if (x == null) {
-                return {x: this._.tx, y: this._.ty};
+                return {x: this._.tx, y: this._.ty, toString: x_y};
             }
             this._.tx += +x;
             this._.ty += +y;
