@@ -582,6 +582,11 @@ window.Raphael = (function () {
                     y = (y1 - y2) / 2;
                 rx = mmax(rx, math.abs(x));
                 ry = mmax(ry, math.abs(y));
+                var h = (x * x) / (rx * rx) + (y * y) / (ry * ry);
+                if (h > 1) {
+                  rx = math.sqrt(h) * rx;
+                  ry = math.sqrt(h) * ry;
+                }
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
