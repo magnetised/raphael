@@ -193,13 +193,13 @@
                     value = ((value & 255) << 16) | (value & 65280) | ((value & 16711680) >>> 16);
                     return "#" + ("000000" + value[toString](16)).slice(-6);
                 } catch(e) {
-                    return _none;
+                    return "none";
                 }
             });
         } else {
             var i = doc.createElement("i");
             i.title = "Rapha\xebl Colour Picker";
-            i.style.display = _none;
+            i.style.display = "none";
             doc.body[appendChild](i);
             toHex = cacher(function (color) {
                 i.style.color = color;
@@ -383,8 +383,8 @@
         if (!colour || !!((colour = Str(colour)).indexOf("-") + 1)) {
             return {r: -1, g: -1, b: -1, hex: "none", error: 1};
         }
-        if (colour == _none) {
-            return {r: -1, g: -1, b: -1, hex: _none};
+        if (colour == "none") {
+            return {r: -1, g: -1, b: -1, hex: "none"};
         }
         !(hsrg[has](colour.toLowerCase().substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
         var res,
@@ -448,7 +448,7 @@
             R.is(opacity, "finite") && (rgb.opacity = opacity);
             return rgb;
         }
-        return {r: -1, g: -1, b: -1, hex: _none, error: 1};
+        return {r: -1, g: -1, b: -1, hex: "none", error: 1};
     }, R);
     R.getColor = function (value) {
         var start = this.getColor.start = this.getColor.start || {h: 0, s: 1, b: value || .75},
@@ -1104,11 +1104,11 @@
             return  "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
         };
         var thePath = function (pathString, SVG) {
-            var el = $(_path);
+            var el = $("path");
             SVG.canvas && SVG.canvas[appendChild](el);
             var p = new Element(el, SVG);
-            p.type = _path;
-            setFillAndStroke(p, {fill: _none, stroke: _black, path: pathString});
+            p.type = "path";
+            setFillAndStroke(p, {fill: "none", stroke: "#000", path: pathString});
             return p;
         };
         var addGradientFill = function (o, gradient, SVG) {
@@ -1185,7 +1185,7 @@
         var setFillAndStroke = function (o, params) {
             var dasharray = {
                     "": [0],
-                    _none: [0],
+                    "none": [0],
                     "-": [3, 1],
                     ".": [1, 1],
                     "-.": [3, 1, 1, 1],
@@ -1203,7 +1203,7 @@
                 addDashes = function (o, value) {
                     value = dasharray[lowerCase.call(value)];
                     if (value) {
-                        var width = o.attrs[_stroke_width] || "1",
+                        var width = o.attrs["stroke-width"] || "1",
                             butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
                             dashes = [];
                         var i = value[length];
@@ -1458,8 +1458,8 @@
             var a = el.attrs,
                 node = el.node,
                 fontSize = node.firstChild ? toInt(doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
-
-            if (params[has](_text)) {
+ 
+            if (params[has]("text")) {
                 a.text = params.text;
                 while (node.firstChild) {
                     node.removeChild(node.firstChild);
@@ -1544,7 +1544,7 @@
             return this;
         };
         Element[proto].hide = function () {
-            !this.removed && (this.node.style.display = _none);
+            !this.removed && (this.node.style.display = "none");
             return this;
         };
         Element[proto].show = function () {
@@ -1566,10 +1566,10 @@
             if (this.removed) {
                 return this;
             }
-            if (this.type == _path) {
+            if (this.type == "path") {
                 return pathDimensions(this.attrs.path);
             }
-            if (this.node.style.display == _none) {
+            if (this.node.style.display == "none") {
                 this.show();
                 var hide = true;
             }
@@ -1581,7 +1581,7 @@
             } finally {
                 bbox = bbox || {};
             }
-            if (this.type == _text) {
+            if (this.type == "text") {
                 bbox = {x: bbox.x, y: Infinity, width: 0, height: 0};
                 for (var i = 0, ii = this.node.getNumberOfChars(); i < ii; i++) {
                     var bb = this.node.getExtentOfChar(i);
@@ -1604,7 +1604,7 @@
                 }
                 this._.rt.deg && (res.rotation = this.rotate());
                 (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
-                res.gradient && res.fill == _none && (res.fill = res.gradient) && delete res.gradient;
+                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
             if (value == null && R.is(name, string)) {
@@ -1713,8 +1713,8 @@
             var el = $("circle");
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {cx: x, cy: y, r: r, fill: _none, stroke: _black};
-            res.type = _circle;
+            res.attrs = {cx: x, cy: y, r: r, fill: "none", stroke: "#000"};
+            res.type = "circle";
             $(el, res.attrs);
             return res;
         },
@@ -1722,8 +1722,8 @@
             var el = $("rect");
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: _none, stroke: _black};
-            res.type = _rect;
+            res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
+            res.type = "rect";
             $(el, res.attrs);
             return res;
         },
@@ -1731,8 +1731,8 @@
             var el = $("ellipse");
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {cx: x, cy: y, rx: rx, ry: ry, fill: _none, stroke: _black};
-            res.type = _ellipse;
+            res.attrs = {cx: x, cy: y, rx: rx, ry: ry, fill: "none", stroke: "#000"};
+            res.type = "ellipse";
             $(el, res.attrs);
             return res;
         },
@@ -1743,7 +1743,7 @@
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
             res.attrs = {x: x, y: y, width: w, height: h, src: src};
-            res.type = _image;
+            res.type = "image";
             return res;
         },
         theText = function (svg, x, y, text) {
@@ -1751,8 +1751,8 @@
             $(el, {x: x, y: y, "text-anchor": "middle"});
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
-            res.attrs = {x: x, y: y, "text-anchor": "middle", text: text, font: availableAttrs.font, stroke: _none, fill: _black};
-            res.type = _text;
+            res.attrs = {x: x, y: y, "text-anchor": "middle", text: text, font: availableAttrs.font, stroke: "none", fill: "#000"};
+            res.type = "text";
             setFillAndStroke(res, res.attrs);
             return res;
         },
@@ -1785,7 +1785,7 @@
                 height: height
             });
             if (container == 1) {
-                cnvs.style.cssText = "position:absolute;left:" + x + "px;top:" + y + _px;
+                cnvs.style.cssText = "position:absolute;left:" + x + "px;top:" + y + "px";
                 doc.body[appendChild](cnvs);
             } else {
                 if (container.firstChild) {
@@ -1944,18 +1944,18 @@
                         dstyle.position = "absolute";
                         dstyle.top = 0;
                         dstyle.left = 0;
-                        dstyle.width = o.paper.width + _px;
-                        dstyle.height = o.paper.height + _px;
+                        dstyle.width = o.paper.width + "px";
+                        dstyle.height = o.paper.height + "px";
                         group.parentNode.insertBefore(div, group);
                         div[appendChild](group);
                         node.clipRect = div;
                     }
                 }
-                if (!params[_clip_rect]) {
+                if (!params["clip-rect"]) {
                     node.clipRect && (node.clipRect.style.clip = E);
                 }
             }
-            if (o.type == _image && params.src) {
+            if (o.type == "image" && params.src) {
                 node.src = params.src;
             }
             if (o.type == "image" && params.opacity) {
@@ -1965,13 +1965,13 @@
             params.font && (s.font = params.font);
             params["font-family"] && (s.fontFamily = '"' + params["font-family"][split](",")[0][rp](/^['"]+|['"]+$/g, E) + '"');
             params["font-size"] && (s.fontSize = params["font-size"]);
-            params[_font_weight] && (s.fontWeight = params[_font_weight]);
-            params[_font_style] && (s.fontStyle = params[_font_style]);
+            params["font-weight"] && (s.fontWeight = params["font-weight"]);
+            params["font-style"] && (s.fontStyle = params["font-style"]);
             if (params.opacity != null || 
-                params[_stroke_width] != null ||
+                params["stroke-width"] != null ||
                 params.fill != null ||
                 params.stroke != null ||
-                params[_stroke_width] != null ||
+                params["stroke-width"] != null ||
                 params["stroke-opacity"] != null ||
                 params["fill-opacity"] != null ||
                 params["stroke-dasharray"] != null ||
@@ -1988,7 +1988,7 @@
                     fill.opacity = opacity;
                 }
                 params.fill && (fill.on = true);
-                if (fill.on == null || params.fill == _none) {
+                if (fill.on == null || params.fill == "none") {
                     fill.on = false;
                 }
                 if (fill.on && params.fill) {
@@ -2010,8 +2010,8 @@
                 var stroke = (node.getElementsByTagName("stroke") && node.getElementsByTagName("stroke")[0]),
                 newstroke = false;
                 !stroke && (newstroke = stroke = createNode("stroke"));
-                if ((params.stroke && params.stroke != _none) ||
-                    params[_stroke_width] ||
+                if ((params.stroke && params.stroke != "none") ||
+                    params["stroke-width"] ||
                     params["stroke-opacity"] != null ||
                     params["stroke-dasharray"] ||
                     params["stroke-miterlimit"] ||
@@ -2212,12 +2212,12 @@
                 w,
                 h;
             switch (this.type) {
-                case _circle:
+                case "circle":
                     x = attr.cx - attr.r;
                     y = attr.cy - attr.r;
                     w = h = attr.r * 2;
                     break;
-                case _ellipse:
+                case "ellipse":
                     x = attr.cx - attr.rx;
                     y = attr.cy - attr.ry;
                     w = attr.rx * 2;
@@ -2229,7 +2229,7 @@
                     w = attr.width || 0;
                     h = attr.height || 0;
                     break;
-                case _text:
+                case "text":
                     this.textpath.v = ["m", round(attr.x), ", ", round(attr.y - 2), "l", round(attr.x) + 1, ", ", round(attr.y - 2)][join](E);
                     x = attr.x - round(this.W / 2);
                     y = attr.y - this.H / 2;
@@ -2329,7 +2329,7 @@
                 }
                 this._.rt.deg && (res.rotation = this.rotate());
                 (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
-                res.gradient && res.fill == _none && (res.fill = res.gradient) && delete res.gradient;
+                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
             if (value == null && R.is(name, "string")) {
@@ -2444,8 +2444,8 @@
             g.coordorigin = vml.coordorigin;
             g[appendChild](o);
             var res = new Element(o, g, vml);
-            res.type = _circle;
-            setFillAndStroke(res, {stroke: _black, fill: _none});
+            res.type = "circle";
+            setFillAndStroke(res, {stroke: "#000", fill: "none"});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.r = r;
@@ -2482,8 +2482,8 @@
             g.coordorigin = vml.coordorigin;
             g[appendChild](o);
             var res = new Element(o, g, vml);
-            res.type = _ellipse;
-            setFillAndStroke(res, {stroke: _black});
+            res.type = "ellipse";
+            setFillAndStroke(res, {stroke: "#000"});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.rx = rx;
@@ -2501,7 +2501,7 @@
             o.src = src;
             g[appendChild](o);
             var res = new Element(o, g, vml);
-            res.type = _image;
+            res.type = "image";
             res.attrs.src = src;
             res.attrs.x = x;
             res.attrs.y = y;
@@ -2515,7 +2515,7 @@
             var g = createNode("group"),
                 el = createNode("shape"),
                 ol = el.style,
-                path = createNode(_path),
+                path = createNode("path"),
                 ps = path.style,
                 o = createNode("textpath");
             g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
@@ -2533,21 +2533,21 @@
             var res = new Element(o, g, vml);
             res.shape = el;
             res.textpath = path;
-            res.type = _text;
+            res.type = "text";
             res.attrs.text = text;
             res.attrs.x = x;
             res.attrs.y = y;
             res.attrs.w = 1;
             res.attrs.h = 1;
-            setFillAndStroke(res, {font: availableAttrs.font, stroke: _none, fill: _black});
+            setFillAndStroke(res, {font: availableAttrs.font, stroke: "none", fill: "#000"});
             res.setBox();
             vml.canvas[appendChild](g);
             return res;
         };
         setSize = function (width, height) {
             var cs = this.canvas.style;
-            width == +width && (width += _px);
-            height == +height && (height += _px);
+            width == +width && (width += "px");
+            height == +height && (height += "px");
             cs.width = width;
             cs.height = height;
             cs.clip = "rect(0 " + width + " " + height + " 0)";
@@ -2583,8 +2583,8 @@
             y = y || 0;
             width = width || 512;
             height = height || 342;
-            width == +width && (width += _px);
-            height == +height && (height += _px);
+            width == +width && (width += "px");
+            height == +height && (height += "px");
             res.width = 1e3;
             res.height = 1e3;
             res.coordsize = zoom * 1e3 + S + zoom * 1e3;
@@ -2868,8 +2868,8 @@
                         y: ncy - newh / 2
                     });
                     break;
-                case _circle:
-                case _ellipse:
+                case "circle":
+                case "ellipse":
                     this.attr({
                         rx: a.rx * kx,
                         ry: a.ry * ky,
@@ -3163,7 +3163,7 @@
                                     upto255(round(from[attr].b + pos * ms * diff[attr].b))
                                 ][join](",") + ")";
                                 break;
-                            case _path:
+                            case "path":
                                 now = [];
                                 for (var i = 0, ii = from[attr][length]; i < ii; i++) {
                                     now[i] = [from[attr][i][0]];
@@ -3183,14 +3183,14 @@
                                         t.y += y;
                                         now = x + S + y;
                                     break;
-                                    case _rotation:
+                                    case "rotation":
                                         now = +from[attr][0] + pos * ms * diff[attr][0];
                                         from[attr][1] && (now += "," + from[attr][1] + "," + from[attr][2]);
                                     break;
-                                    case _scale:
+                                    case "scale":
                                         now = [+from[attr][0] + pos * ms * diff[attr][0], +from[attr][1] + pos * ms * diff[attr][1], (2 in to[attr] ? to[attr][2] : E), (3 in to[attr] ? to[attr][3] : E)][join](S);
                                     break;
-                                    case _clip_rect:
+                                    case "clip-rect":
                                         now = [];
                                         i = 4;
                                         while (i--) {
@@ -3244,16 +3244,16 @@
             this._.tx += +x;
             this._.ty += +y;
             switch (this.type) {
-                case _circle:
-                case _ellipse:
+                case "circle":
+                case "ellipse":
                     this.attr({cx: +x + this.attrs.cx, cy: +y + this.attrs.cy});
                     break;
-                case _rect:
-                case _image:
-                case _text:
+                case "rect":
+                case "image":
+                case "text":
                     this.attr({x: +x + this.attrs.x, y: +y + this.attrs.y});
                     break;
-                case _path:
+                case "path":
                     var path = pathToRelative(this.attrs.path);
                     path[0][1] += +x;
                     path[0][2] += +y;
@@ -3384,7 +3384,7 @@
                             b: (toColour.b - from[attr].b) / ms
                         };
                         break;
-                    case _path:
+                    case "path":
                         var pathes = path2curve(from[attr], to[attr]);
                         from[attr] = pathes[0];
                         var toPath = pathes[1];
@@ -3400,15 +3400,15 @@
                         var values = Str(params[attr])[split](separator),
                             from2 = Str(from[attr])[split](separator);
                         switch (attr) {
-                            case _translation:
+                            case "translation":
                                 from[attr] = [0, 0];
                                 diff[attr] = [values[0] / ms, values[1] / ms];
                             break;
-                            case _rotation:
+                            case "rotation":
                                 from[attr] = (from2[1] == values[1] && from2[2] == values[2]) ? from2 : [0, values[1], values[2]];
                                 diff[attr] = [(values[0] - from[attr][0]) / ms, 0, 0];
                             break;
-                            case _scale:
+                            case "scale":
                                 params[attr] = values;
                                 from[attr] = Str(from[attr])[split](separator);
                                 diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][1]) / ms, 0, 0];
@@ -3675,18 +3675,18 @@
         if (font) {
             for (var i = 0, ii = font[length]; i < ii; i++) {
                 thefont = font[i];
-                if (thefont.face[_font_weight] == weight && (thefont.face[_font_style] == style || !thefont.face[_font_style]) && thefont.face["font-stretch"] == stretch) {
+                if (thefont.face["font-weight"] == weight && (thefont.face["font-style"] == style || !thefont.face["font-style"]) && thefont.face["font-stretch"] == stretch) {
                     break;
                 }
             }
         }
         return thefont;
     };
-    paperproto.print = function (x, y, string, font, size, origin, letter_spacing) {
+    paperproto.print = function (x, y, text, font, size, origin, letter_spacing) {
         origin = origin || "middle"; // baseline|middle
         letter_spacing = mmax(mmin(letter_spacing || 0, 1), -1);
         var out = this.set(),
-            letters = Str(string)[split](E),
+            letters = Str(text)[split](E),
             shift = 0,
             path = E,
             scale;
@@ -3705,6 +3705,23 @@
             out.scale(scale, scale, top, height).translate(x - top, y - height);
         }
         return out;
+    };
+    paperproto.measureText = function (text, font, size) {
+        var letters = (text + E)[split](E),
+            width = 0,
+            scale;
+        R.is(font, string) && (font = this.getFont(font));
+        if (font) {
+            scale = (size || 16) / font.face["units-per-em"];
+            for (var i = 0, ii = letters[length]; i < ii; i++) {
+                var prev = i && font.glyphs[letters[i - 1]] || {},
+                    curr = font.glyphs[letters[i]];
+								width += (curr.w || font.w);
+								width += i ? (prev.k && prev.k[letters[i]] || 0) : 0;
+            }
+						return width*scale;
+        }
+				return 0;
     };
 
     R.format = function (token, params) {
